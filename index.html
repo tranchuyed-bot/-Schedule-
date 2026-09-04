@@ -2,7 +2,6 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8" />
-    <!-- Tối ưu cho thiết bị di động, bỏ user-scalable=no để không vi phạm accessibility nhưng vẫn chặn zoom bằng font 16px -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -47,16 +46,15 @@
         * {
             margin: 0; padding: 0; box-sizing: border-box;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            -webkit-tap-highlight-color: transparent; /* Tắt nháy xanh khi bấm trên iOS */
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
             background: var(--bg-body); color: var(--text-main);
             display: flex; flex-direction: column;
-            height: 100vh; height: 100dvh; /* Dùng dvh cho iOS 15+ để tránh thanh địa chỉ che mất */
+            height: 100vh; height: 100dvh;
             overflow: hidden;
             transition: background 0.3s, color 0.3s;
-            /* Safe area cho iPhone tai thỏ */
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
             padding-left: env(safe-area-inset-left);
@@ -76,7 +74,7 @@
             background: transparent; border: none; cursor: pointer; color: var(--text-muted);
             padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: 500;
             display: flex; align-items: center; gap: 6px;
-            -webkit-appearance: none; /* Sửa lỗi hiển thị nút bấm mặc định trên iOS */
+            -webkit-appearance: none;
         }
         .header-actions button:active { opacity: 0.7; }
         .header-actions .btn-primary { background: var(--primary); color: #fff; border-radius: 20px; padding: 8px 16px; }
@@ -98,7 +96,7 @@
         .month-title { font-size: 20px; font-weight: 700; text-transform: capitalize; }
         .month-nav { display: flex; gap: 8px; }
         .month-nav button {
-            background: var(--bg-body); border: none; border-radius: 10px; width: 44px; height: 44px; /* Tăng touch target */
+            background: var(--bg-body); border: none; border-radius: 10px; width: 44px; height: 44px;
             cursor: pointer; color: var(--text-main); display: flex; align-items: center; justify-content: center;
         }
 
@@ -157,7 +155,7 @@
 
         .ag-delete {
             position: absolute; top: 12px; right: 12px; cursor: pointer; color: #9ca3af;
-            font-size: 16px; padding: 8px; /* Tăng padding để dễ bấm trên iPhone */
+            font-size: 16px; padding: 8px;
         }
         .ag-delete:active { color: #ef4444; }
 
@@ -180,15 +178,13 @@
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 14px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; }
         
-        /* QUAN TRỌNG CHO iPHONE: font-size phải >= 16px để không tự động zoom */
         .form-group input, .form-group select {
             width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px;
             outline: none; background: var(--bg-body); color: var(--text-main);
-            font-size: 16px !important; /* FIX LỖI ZOOM iPHONE */
-            -webkit-appearance: none; /* Bỏ style select cục mịch mặc định */
+            font-size: 16px !important;
+            -webkit-appearance: none;
         }
         
-        /* Custom mũi tên cho select trên iPhone */
         .select-wrapper { position: relative; }
         .select-wrapper::after {
             content: "\f078"; font-family: "Font Awesome 6 Free"; font-weight: 900;
@@ -206,7 +202,7 @@
 
         /* ===== TOAST ===== */
         .toast {
-            position: fixed; bottom: calc(30px + env(safe-area-inset-bottom)); /* Tránh Home indicator */
+            position: fixed; bottom: calc(30px + env(safe-area-inset-bottom));
             left: 50%; transform: translateX(-50%) translateY(80px);
             background: #1f2937; color: #fff; padding: 14px 28px; border-radius: 30px; font-size: 14px; font-weight: 500;
             z-index: 2000; opacity: 0; transition: all 0.35s ease; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); white-space: nowrap;
@@ -215,7 +211,7 @@
         .toast.error { background: #dc2626; }
         .hidden-input { display: none; }
 
-        /* ===== MOBILE RESPONSIVE (iPHONE) ===== */
+        /* ===== MOBILE RESPONSIVE ===== */
         @media (max-width: 820px) {
             .main-layout { flex-direction: column; overflow-y: auto; -webkit-overflow-scrolling: touch; }
             .calendar-section { flex: none; padding: 16px 12px 0 12px; }
@@ -227,8 +223,8 @@
             .agenda-header { padding: 16px 16px 8px; border-bottom: none; }
             .agenda-list { padding: 8px 16px 40px; }
             
-            .header-actions span { display: none; /* Ẩn chữ nút menu, chỉ giữ icon để đỡ chật màn hình */ }
-            .header-actions .btn-primary span { display: inline; } /* Giữ chữ Thêm */
+            .header-actions span { display: none; }
+            .header-actions .btn-primary span { display: inline; }
         }
     </style>
 </head>
@@ -282,7 +278,7 @@
                 <input type="text" id="evTitle" placeholder="VD: Giải tích 1" autocomplete="off" />
             </div>
             <div class="form-group">
-                <label>Thời gian</label>
+                <label>Thời gian (VD: 13:00 hoặc 13:00 - 16:35)</label>
                 <input type="text" id="evTime" placeholder="VD: 13:00 - 16:35" autocomplete="off" />
             </div>
             <div class="form-group">
@@ -318,14 +314,13 @@
     <script>
         let db = {};
         
-        // Mẫu hiển thị gốc
         const SAMPLE_DATA = {
             "2026-09-07": [{ title: "Giải tích 1 (BAS1203)", time: "13:00 - 16:35", type: "uni", nhóm: "04", phòng: "2E27-2E27" }],
             "2026-09-08": [{ title: "Giáo dục thể chất 1 (BAS1106)", time: "13:00 - 16:35", type: "uni", nhóm: "04", phòng: "SANTRG1-san truong 1" }],
             "2026-09-12": [{ title: "Triết học Mác - Lênin (BAS1150)", time: "07:00 - 10:35", type: "uni", nhóm: "12", phòng: "2A27-2A27" }]
         };
 
-        let currentDate = new Date(2026, 8, 4); // Tháng 9/2026
+        let currentDate = new Date(2026, 8, 4);
         let selectedDateStr = "2026-09-04";
 
         const TYPE_ICONS = { uni: 'fa-book-open', goal: 'fa-bullseye', health: 'fa-heart-pulse', money: 'fa-coins', other: 'fa-puzzle-piece' };
@@ -353,7 +348,7 @@
 
             let firstDayIndex = new Date(year, month, 1).getDay() - 1; if (firstDayIndex === -1) firstDayIndex = 6;
             const lastDay = new Date(year, month + 1, 0).getDate();
-            const todayStr = new Date().toLocaleDateString('en-CA'); // Trả về định dạng yyyy-mm-dd theo giờ local
+            const todayStr = new Date().toLocaleDateString('en-CA');
 
             for (let i = 0; i < firstDayIndex; i++) grid.innerHTML += `<div class="day-box empty"></div>`;
             for (let i = 1; i <= lastDay; i++) {
@@ -442,9 +437,19 @@
             if (!title) return showToast('Vui lòng nhập tên công việc!', true);
             if (!db[selectedDateStr]) db[selectedDateStr] = [];
             
+            // Lấy giờ bắt đầu từ chuỗi thời gian để phục vụ nhắc nhở
+            let timeStart = null;
+            if (time && time.includes('-')) {
+                const start = time.split('-')[0].trim();
+                if (/^\d{1,2}:\d{2}$/.test(start)) timeStart = start;
+            } else if (time && /^\d{1,2}:\d{2}$/.test(time)) {
+                timeStart = time;
+            }
+
             const newEvent = { title, time, type };
             if (group) newEvent.nhóm = group;
             if (room) newEvent.phòng = room;
+            if (timeStart) newEvent.timeStart = timeStart;
 
             db[selectedDateStr].push(newEvent);
             saveData(); closeModal(); renderCalendar(); renderAgenda(); showToast('Đã lưu thành công!');
@@ -489,9 +494,88 @@
             clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
         }
         
+        // ============================================================
+        // THÔNG BÁO ĐẨY TỰ ĐỘNG (PUSH NOTIFICATION)
+        // ============================================================
+        let reminderInterval = null;
+
+        async function requestNotificationPermission() {
+            if (!('Notification' in window)) return false;
+            if (Notification.permission === 'granted') return true;
+            if (Notification.permission === 'denied') return false;
+            const result = await Notification.requestPermission();
+            return result === 'granted';
+        }
+
+        function showPushNotification(title, body, type) {
+            if (!('Notification' in window) || Notification.permission !== 'granted') return;
+            try {
+                new Notification(title, { body, icon: '🔔' });
+                showToast(`🔔 Nhắc nhở: ${title}`);
+            } catch(e) {
+                console.log('Lỗi hiển thị thông báo:', e);
+            }
+        }
+
+        function checkReminders() {
+            const now = new Date();
+            const todayStr = now.toLocaleDateString('en-CA');
+            const currentHour = now.getHours().toString().padStart(2,'0');
+            const currentMinute = now.getMinutes().toString().padStart(2,'0');
+            const timeNow = `${currentHour}:${currentMinute}`;
+
+            const events = db[todayStr] || [];
+            events.forEach((ev, index) => {
+                // Nếu chưa có timeStart, thử parse từ time
+                if (!ev.timeStart && ev.time) {
+                    let start = null;
+                    if (ev.time.includes('-')) {
+                        const s = ev.time.split('-')[0].trim();
+                        if (/^\d{1,2}:\d{2}$/.test(s)) start = s;
+                    } else if (/^\d{1,2}:\d{2}$/.test(ev.time)) {
+                        start = ev.time;
+                    }
+                    if (start) {
+                        ev.timeStart = start;
+                        // Lưu lại để dùng sau
+                        saveData();
+                    }
+                }
+
+                if (ev.timeStart && ev.timeStart === timeNow) {
+                    // Kiểm tra đã gửi trong vòng 5 phút chưa
+                    const lastNotified = ev._notifiedTime || 0;
+                    if (Date.now() - lastNotified < 5 * 60 * 1000) return;
+                    // Hiển thị thông báo
+                    showPushNotification(`⏰ ${ev.title}`, `Bắt đầu lúc ${ev.timeStart}`, ev.type);
+                    ev._notifiedTime = Date.now();
+                    saveData();
+                }
+            });
+        }
+
+        async function initReminders() {
+            const granted = await requestNotificationPermission();
+            if (!granted) {
+                console.log('❌ Thông báo không được cấp quyền.');
+                return;
+            }
+            console.log('✅ Thông báo đã được cấp quyền.');
+            // Kiểm tra ngay lập tức
+            checkReminders();
+            // Kiểm tra mỗi 30 giây
+            if (reminderInterval) clearInterval(reminderInterval);
+            reminderInterval = setInterval(checkReminders, 30000);
+        }
+
+        // ============================================================
         // Đóng Modal khi bấm vùng ngoài
+        // ============================================================
         document.getElementById('eventModal').addEventListener('click', (e) => { if (e.target === e.currentTarget) closeModal(); });
 
+        // ============================================================
+        // KHỞI TẠO
+        // ============================================================
         function init() {
             loadTheme();
             if (!loadData()) { db = JSON.parse(JSON.stringify(SAMPLE_DATA)); saveData(); }
@@ -501,6 +585,9 @@
             currentDate = new Date(parseInt(selectedDateStr.split('-')[0]), parseInt(selectedDateStr.split('-')[1]) - 1, 1);
             
             renderCalendar(); renderAgenda();
+            
+            // Bắt đầu nhắc nhở tự động
+            initReminders();
         }
         init();
     </script>
