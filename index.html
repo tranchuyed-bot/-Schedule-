@@ -6,6 +6,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Lịch Học Kỳ 1 – 2026</title>
+
+    <!-- Manifest cho PWA (cần thiết cho iOS push) -->
+    <link rel="manifest" href="manifest.json" />
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
@@ -495,7 +499,7 @@
         }
         
         // ============================================================
-        // THÔNG BÁO ĐẨY TỰ ĐỘNG (PUSH NOTIFICATION)
+        // THÔNG BÁO ĐẨY TỰ ĐỘNG (PUSH NOTIFICATION) – HỖ TRỢ iOS
         // ============================================================
         let reminderInterval = null;
 
@@ -507,13 +511,27 @@
             return result === 'granted';
         }
 
+        // Hiển thị thông báo ưu tiên qua Service Worker (để chạy ngầm trên iOS)
         function showPushNotification(title, body, type) {
             if (!('Notification' in window) || Notification.permission !== 'granted') return;
-            try {
-                new Notification(title, { body, icon: '🔔' });
+            
+            // Nếu có Service Worker đang điều khiển, gửi message để hiển thị
+            if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'SHOW_NOTIFICATION',
+                    title: title,
+                    body: body,
+                    icon: '🔔'
+                });
                 showToast(`🔔 Nhắc nhở: ${title}`);
-            } catch(e) {
-                console.log('Lỗi hiển thị thông báo:', e);
+            } else {
+                // Fallback: dùng Notification API trực tiếp (vẫn hiển thị nhưng không chạy nền tốt trên iOS)
+                try {
+                    new Notification(title, { body, icon: '🔔' });
+                    showToast(`🔔 Nhắc nhở: ${title}`);
+                } catch(e) {
+                    console.log('Lỗi hiển thị thông báo:', e);
+                }
             }
         }
 
@@ -537,21 +555,33 @@
                     }
                     if (start) {
                         ev.timeStart = start;
-                        // Lưu lại để dùng sau
                         saveData();
                     }
                 }
 
                 if (ev.timeStart && ev.timeStart === timeNow) {
-                    // Kiểm tra đã gửi trong vòng 5 phút chưa
                     const lastNotified = ev._notifiedTime || 0;
                     if (Date.now() - lastNotified < 5 * 60 * 1000) return;
-                    // Hiển thị thông báo
                     showPushNotification(`⏰ ${ev.title}`, `Bắt đầu lúc ${ev.timeStart}`, ev.type);
                     ev._notifiedTime = Date.now();
                     saveData();
                 }
             });
+        }
+
+        // Đăng ký Service Worker để nhận thông báo nền
+        async function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registration = await navigator.serviceWorker.register('/service-worker.js');
+                    console.log('✅ Service Worker registered:', registration);
+                    return registration;
+                } catch (err) {
+                    console.warn('❌ Service Worker registration failed:', err);
+                    return null;
+                }
+            }
+            return null;
         }
 
         async function initReminders() {
@@ -561,6 +591,10 @@
                 return;
             }
             console.log('✅ Thông báo đã được cấp quyền.');
+            
+            // Đăng ký Service Worker (nếu chưa)
+            await registerServiceWorker();
+            
             // Kiểm tra ngay lập tức
             checkReminders();
             // Kiểm tra mỗi 30 giây
