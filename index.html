@@ -1,184 +1,1324 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bảng Lịch Trình & Mục Tiêu</title>
-    <!-- Nhúng thư viện SortableJS để hỗ trợ kéo thả trên điện thoại -->
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <style>
-        /* CSS Căn bản & Reset */
-        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-        body { background-color: #f4f5f7; margin: 0; padding: 20px; color: #333; }
-        h1 { text-align: center; color: #172b4d; margin-bottom: 20px; font-size: 24px; }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Lịch Học Kỳ 1 – 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-        /* Bố cục Bảng (Board) */
-        .board {
-            display: flex;
-            gap: 15px;
-            overflow-x: auto; /* Cuộn ngang trên PC nếu quá nhiều cột */
-            padding-bottom: 20px;
-            align-items: flex-start;
+    <style>
+        /* ===== VARIABLES ===== */
+        :root {
+            --bg-body: #f3f4f6;
+            --bg-card: #ffffff;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+
+            --tag-uni: #dbeafe;
+            --tag-uni-text: #1e40af;
+            --tag-goal: #fef3c7;
+            --tag-goal-text: #92400e;
+            --tag-health: #d1fae5;
+            --tag-health-text: #065f46;
+            --tag-money: #fce7f3;
+            --tag-money-text: #9d174d;
+            --tag-other: #e0e7ff;
+            --tag-other-text: #3730a3;
+
+            --dot-uni: #3b82f6;
+            --dot-goal: #f59e0b;
+            --dot-health: #10b981;
+            --dot-money: #ec4899;
+            --dot-other: #6366f1;
         }
 
-        /* Bố cục Cột (Column) */
-        .column {
-            background-color: #ebecf0;
-            border-radius: 8px;
-            min-width: 280px;
-            max-width: 300px;
-            flex-shrink: 0;
+        /* Dark mode */
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --tag-uni: #1e3a5f;
+            --tag-uni-text: #93c5fd;
+            --tag-goal: #451a03;
+            --tag-goal-text: #fcd34d;
+            --tag-health: #064e3b;
+            --tag-health-text: #6ee7b7;
+            --tag-money: #4c0519;
+            --tag-money-text: #f9a8d4;
+            --tag-other: #1e1b4b;
+            --tag-other-text: #a5b4fc;
+            --dot-uni: #60a5fa;
+            --dot-goal: #fbbf24;
+            --dot-health: #34d399;
+            --dot-money: #f472b6;
+            --dot-other: #818cf8;
+        }
+
+        /* ===== RESET ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            background: var(--bg-body);
+            color: var(--text-main);
             display: flex;
             flex-direction: column;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            height: 100vh;
+            overflow: hidden;
+            transition: background 0.3s, color 0.3s;
         }
 
-        .column-header {
-            padding: 12px 15px;
-            font-weight: 600;
-            color: #172b4d;
-            border-bottom: 2px solid #dfe1e6;
+        /* ===== HEADER ===== */
+        header {
+            background: var(--bg-card);
+            padding: 14px 24px;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            transition: background 0.3s, border-color 0.3s;
+            flex-wrap: wrap;
+            gap: 8px;
         }
-
-        .column-body {
-            padding: 10px;
-            min-height: 150px; /* Đảm bảo có khoảng trống để thả thẻ vào */
+        .header-title {
+            font-size: 20px;
+            font-weight: 700;
             display: flex;
-            flex-direction: column;
+            align-items: center;
             gap: 10px;
         }
+        .header-title i {
+            color: var(--primary);
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .header-actions button {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+        .header-actions button:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        [data-theme="dark"] .header-actions button:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .header-actions .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            padding: 8px 18px;
+            border-radius: 20px;
+        }
+        .header-actions .btn-primary:hover {
+            background: var(--primary-hover);
+            opacity: 0.9;
+        }
+        .header-actions .btn-danger {
+            color: #ef4444;
+        }
+        .header-actions .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
 
-        /* Bố cục Thẻ (Card) */
-        .card {
-            background-color: #fff;
-            padding: 12px;
-            border-radius: 6px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-            cursor: grab;
+        /* ===== MAIN LAYOUT ===== */
+        .main-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            gap: 0;
+        }
+
+        /* ===== CALENDAR SECTION (TRÁI) ===== */
+        .calendar-section {
+            flex: 2;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            min-width: 0;
+        }
+        .calendar-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            max-width: 820px;
+            width: 100%;
+            margin: 0 auto;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .month-title {
+            font-size: 22px;
+            font-weight: 700;
+            text-transform: capitalize;
+        }
+        .month-nav {
+            display: flex;
+            gap: 4px;
+        }
+        .month-nav button {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .month-nav button:hover {
+            background: var(--bg-body);
+        }
+        .month-nav button:active {
+            transform: scale(0.95);
+        }
+
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+
+        .day-box {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 6px 4px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 500;
+            font-size: 15px;
+            border: 2px solid transparent;
+            position: relative;
+            background: transparent;
+            min-height: 56px;
+        }
+        .day-box:hover {
+            background: rgba(0, 0, 0, 0.04);
+            border-color: var(--border);
+        }
+        [data-theme="dark"] .day-box:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .day-box.empty {
+            cursor: default;
+            background: transparent !important;
+            border-color: transparent !important;
+        }
+        .day-box.empty:hover {
+            background: transparent !important;
+            border-color: transparent !important;
+        }
+        .day-box.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+            border-color: var(--primary);
+        }
+        .day-box.today {
+            border-color: var(--primary);
+        }
+        .day-box.active.today {
+            border-color: var(--primary);
+        }
+        .day-box .day-number {
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+        .day-box.active .day-number {
+            color: #fff;
+        }
+
+        /* Dấu chấm sự kiện */
+        .event-dots {
+            display: flex;
+            gap: 3px;
+            margin-top: 4px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .dot-uni {
+            background: var(--dot-uni);
+        }
+        .dot-goal {
+            background: var(--dot-goal);
+        }
+        .dot-health {
+            background: var(--dot-health);
+        }
+        .dot-money {
+            background: var(--dot-money);
+        }
+        .dot-other {
+            background: var(--dot-other);
+        }
+        .day-box.active .dot {
+            opacity: 0.85;
+        }
+
+        /* ===== AGENDA SECTION (PHẢI) ===== */
+        .agenda-section {
+            flex: 1;
+            background: var(--bg-card);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            min-width: 280px;
+            max-width: 420px;
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .agenda-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            transition: border-color 0.3s;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .agenda-date {
+            font-size: 17px;
+            font-weight: 700;
+        }
+        .agenda-date small {
+            font-weight: 400;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-left: 6px;
+        }
+        .btn-add {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 600;
             font-size: 14px;
-            line-height: 1.4;
-            transition: transform 0.1s, box-shadow 0.1s;
-            border-left: 4px solid #ccc;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .btn-add:hover {
+            background: var(--primary-hover);
+            transform: scale(1.02);
+        }
+        .btn-add:active {
+            transform: scale(0.95);
         }
 
-        .card:active { cursor: grabbing; }
-
-        /* Phân loại màu sắc thẻ */
-        .card.university { border-left-color: #0079bf; } /* Môn đại học - Xanh dương */
-        .card.goal { border-left-color: #f2d600; }       /* Mục tiêu - Vàng */
-        .card.health { border-left-color: #61bd4f; }     /* Sức khỏe - Xanh lá */
-        
-        .time-tag {
-            display: inline-block;
-            background: #dfe1e6;
-            color: #42526e;
-            font-size: 11px;
-            padding: 2px 6px;
-            border-radius: 3px;
-            margin-top: 8px;
-            font-weight: bold;
+        .agenda-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
-        /* Hiệu ứng khi kéo thả */
-        .sortable-ghost { opacity: 0.4; background-color: #f4f5f7; border: 1px dashed #0079bf; }
-        .sortable-drag { cursor: grabbing !important; }
+        /* Thẻ sự kiện trong danh sách */
+        .agenda-card {
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            position: relative;
+            transition: 0.2s;
+            background: var(--bg-body);
+        }
+        .agenda-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        .agenda-card.uni {
+            background: var(--tag-uni);
+            border-color: transparent;
+        }
+        .agenda-card.goal {
+            background: var(--tag-goal);
+            border-color: transparent;
+        }
+        .agenda-card.health {
+            background: var(--tag-health);
+            border-color: transparent;
+        }
+        .agenda-card.money {
+            background: var(--tag-money);
+            border-color: transparent;
+        }
+        .agenda-card.other {
+            background: var(--tag-other);
+            border-color: transparent;
+        }
 
-        /* Responsive cho Điện thoại (iPhone) */
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            .board {
-                flex-direction: column; /* Xếp dọc các cột trên mobile */
-                overflow-x: hidden;
+        .ag-time {
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0.8;
+        }
+        .ag-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .ag-title .type-icon {
+            font-size: 13px;
+            opacity: 0.6;
+        }
+        .ag-delete {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            cursor: pointer;
+            color: #9ca3af;
+            font-size: 14px;
+            transition: 0.2s;
+            padding: 4px;
+            border-radius: 50%;
+        }
+        .ag-delete:hover {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 40px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        .empty-state i {
+            font-size: 44px;
+            color: #d1d5db;
+            opacity: 0.5;
+        }
+        .empty-state p {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(2px);
+            padding: 20px;
+        }
+        .modal {
+            background: var(--bg-card);
+            width: 100%;
+            max-width: 440px;
+            border-radius: 16px;
+            padding: 28px 24px 24px;
+            animation: modalIn 0.25s ease;
+            transition: background 0.3s;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        @keyframes modalIn {
+            from {
+                transform: scale(0.92) translateY(10px);
+                opacity: 0;
             }
-            .column {
-                min-width: 100%;
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+        .modal h2 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .modal h2 i {
+            color: var(--primary);
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            outline: none;
+            background: var(--bg-body);
+            color: var(--text-main);
+            font-size: 14px;
+            transition: border 0.2s;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 50px;
+        }
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 24px;
+        }
+        .btn-cancel {
+            padding: 10px 20px;
+            background: var(--bg-body);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-main);
+            transition: 0.2s;
+        }
+        .btn-cancel:hover {
+            background: var(--border);
+        }
+        .btn-save {
+            padding: 10px 24px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        .btn-save:hover {
+            background: var(--primary-hover);
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #1f2937;
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 2000;
+            opacity: 0;
+            transition: all 0.35s ease;
+            pointer-events: none;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast.error {
+            background: #dc2626;
+        }
+        [data-theme="dark"] .toast {
+            background: #374151;
+        }
+        [data-theme="dark"] .toast.error {
+            background: #b91c1c;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 820px) {
+            .main-layout {
+                flex-direction: column;
+                overflow: auto;
+            }
+            .calendar-section {
+                flex: none;
+                padding: 16px;
+            }
+            .calendar-card {
+                padding: 16px;
+            }
+            .agenda-section {
+                border-left: none;
+                border-top: 1px solid var(--border);
+                flex: none;
+                min-height: 380px;
                 max-width: 100%;
             }
+            .day-box {
+                font-size: 13px;
+                padding: 4px 2px;
+                min-height: 44px;
+            }
+            .day-box .day-number {
+                font-size: 13px;
+            }
+            .dot {
+                width: 5px;
+                height: 5px;
+            }
+            .agenda-header {
+                padding: 16px 20px 12px;
+            }
+            .agenda-list {
+                padding: 12px 16px 20px;
+            }
+            .month-title {
+                font-size: 18px;
+            }
+            header {
+                padding: 10px 16px;
+            }
+            .header-title {
+                font-size: 17px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calendar-card {
+                padding: 12px;
+            }
+            .day-box {
+                font-size: 11px;
+                min-height: 36px;
+                border-radius: 8px;
+                padding: 2px 2px;
+            }
+            .day-box .day-number {
+                font-size: 11px;
+            }
+            .weekdays {
+                font-size: 11px;
+            }
+            .month-title {
+                font-size: 16px;
+            }
+            .month-nav button {
+                width: 34px;
+                height: 34px;
+                font-size: 14px;
+            }
+            .agenda-date {
+                font-size: 15px;
+            }
+            .btn-add {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+            .modal {
+                padding: 20px 16px;
+            }
+            .agenda-card {
+                padding: 10px 12px;
+            }
+            .ag-title {
+                font-size: 13px;
+            }
+            .header-actions button span {
+                display: none;
+            }
+            .header-actions button {
+                padding: 6px 8px;
+            }
+            .header-actions .btn-primary span {
+                display: inline;
+            }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        [data-theme="dark"] ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+        [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        /* Ẩn input file */
+        .hidden-input {
+            display: none;
         }
     </style>
 </head>
 <body>
 
-    <h1>📅 Bảng Lịch Trình & Mục Tiêu Cá Nhân</h1>
+    <!-- ===== HEADER ===== -->
+    <header>
+        <div class="header-title">
+            <i class="fa-regular fa-calendar-check"></i>
+            <span>Sổ Lịch Trình</span>
+        </div>
+        <div class="header-actions">
+            <button onclick="exportData()" title="Xuất dữ liệu">
+                <i class="fa-solid fa-download"></i> <span>Xuất</span>
+            </button>
+            <button onclick="document.getElementById('importInput').click()" title="Nhập dữ liệu">
+                <i class="fa-solid fa-upload"></i> <span>Nhập</span>
+            </button>
+            <input type="file" id="importInput" class="hidden-input" accept=".json" onchange="importData(event)" />
+            <button onclick="clearAll()" class="btn-danger" title="Xóa tất cả">
+                <i class="fa-regular fa-trash-can"></i> <span>Xóa</span>
+            </button>
+            <button onclick="toggleTheme()" title="Chế độ tối/sáng">
+                <i class="fa-regular fa-moon" id="themeIcon"></i>
+            </button>
+            <button class="btn-primary" onclick="openModal()">
+                <i class="fa-solid fa-plus"></i> <span>Thêm</span>
+            </button>
+        </div>
+    </header>
 
-    <div class="board">
-        <!-- Cột: Chờ Xử Lý (Kho chứa mục tiêu) -->
-        <div class="column">
-            <div class="column-header">🎯 Mục tiêu & Thói quen</div>
-            <div class="column-body" id="col-backlog">
-                <div class="card goal">Học Tiếng Anh <br><span class="time-tag">30 phút/ngày</span></div>
-                <div class="card health">Tập thể dục sáng <br><span class="time-tag">06:30 - 07:15</span></div>
-                <div class="card goal">Làm đề thi Bằng lái A1</div>
-                <div class="card goal">Cập nhật chi tiêu vào App</div>
+    <!-- ===== MAIN ===== -->
+    <div class="main-layout">
+        <!-- CALENDAR -->
+        <div class="calendar-section">
+            <div class="calendar-card">
+                <div class="calendar-header">
+                    <div class="month-title" id="monthTitle">Tháng 9, 2026</div>
+                    <div class="month-nav">
+                        <button onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                        <button onclick="changeMonth(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+
+                <div class="weekdays">
+                    <div>T2</div><div>T3</div><div>T4</div><div>T5</div><div>T6</div><div>T7</div><div>CN</div>
+                </div>
+
+                <div class="days-grid" id="daysGrid">
+                    <!-- JS render -->
+                </div>
             </div>
         </div>
 
-        <!-- Cột: Thứ 2 -->
-        <div class="column">
-            <div class="column-header">Thứ 2</div>
-            <div class="column-body" id="col-mon">
-                <div class="card university">Giải tích 1 <br><span class="time-tag">13:00 - 16:35</span></div>
+        <!-- AGENDA -->
+        <div class="agenda-section">
+            <div class="agenda-header">
+                <div class="agenda-date" id="selectedDateDisplay">
+                    04/09/2026 <small>Thứ 4</small>
+                </div>
+                <button class="btn-add" onclick="openModal()">
+                    <i class="fa-solid fa-plus"></i> Thêm
+                </button>
             </div>
-        </div>
-
-        <!-- Cột: Thứ 3 -->
-        <div class="column">
-            <div class="column-header">Thứ 3</div>
-            <div class="column-body" id="col-tue">
-                <div class="card university">Giáo dục thể chất 1 <br><span class="time-tag">13:00 - 16:35</span></div>
-            </div>
-        </div>
-
-        <!-- Cột: Thứ 4 -->
-        <div class="column">
-            <div class="column-header">Thứ 4</div>
-            <div class="column-body" id="col-wed">
-                <div class="card university">Đại số <br><span class="time-tag">13:00 - 16:35</span></div>
-            </div>
-        </div>
-
-        <!-- Cột: Thứ 5 -->
-        <div class="column">
-            <div class="column-header">Thứ 5</div>
-            <div class="column-body" id="col-thu">
-                <div class="card university">Nhập môn AI <br><span class="time-tag">13:00 - 16:35</span></div>
-            </div>
-        </div>
-
-        <!-- Cột: Thứ 6 (Trống lịch) -->
-        <div class="column">
-            <div class="column-header">Thứ 6</div>
-            <div class="column-body" id="col-fri">
-                <!-- Bạn có thể kéo thả mục tiêu vào đây -->
-            </div>
-        </div>
-
-        <!-- Cột: Thứ 7 -->
-        <div class="column">
-            <div class="column-header">Thứ 7</div>
-            <div class="column-body" id="col-sat">
-                <div class="card university">Triết học Mác - Lênin <br><span class="time-tag">07:00 - 10:35</span></div>
+            <div class="agenda-list" id="agendaList">
+                <!-- JS render -->
             </div>
         </div>
     </div>
 
-    <script>
-        // Lấy tất cả các vùng có thể chứa thẻ (column-body)
-        const columns = document.querySelectorAll('.column-body');
+    <!-- ===== MODAL ===== -->
+    <div class="modal-overlay" id="eventModal">
+        <div class="modal">
+            <h2><i class="fa-regular fa-calendar-plus"></i> Thêm lịch trình</h2>
+            <div class="form-group">
+                <label>Tên công việc / Môn học</label>
+                <input type="text" id="evTitle" placeholder="VD: Giải tích 1, Tập gym..." />
+            </div>
+            <div class="form-group">
+                <label>Thời gian</label>
+                <input type="text" id="evTime" placeholder="VD: 13:00 - 16:35" />
+            </div>
+            <div class="form-group">
+                <label>Phân loại</label>
+                <select id="evType">
+                    <option value="uni">📚 Môn Đại Học</option>
+                    <option value="goal">🎯 Mục tiêu & Kỹ năng</option>
+                    <option value="health">🏃 Sức khỏe</option>
+                    <option value="money">💰 Tài chính</option>
+                    <option value="other">🎨 Khác</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal()">Hủy</button>
+                <button class="btn-save" onclick="saveEvent()">Lưu lại</button>
+            </div>
+        </div>
+    </div>
 
-        // Kích hoạt tính năng Kéo-Thả cho từng cột
-        columns.forEach(col => {
-            new Sortable(col, {
-                group: 'shared', // Cho phép kéo thả chéo giữa các cột
-                animation: 150,  // Tốc độ hiệu ứng di chuyển (ms)
-                ghostClass: 'sortable-ghost', // Lớp CSS khi thẻ đang được giữ
-                dragClass: 'sortable-drag',
-                delayOnTouchOnly: true, // Chỉ delay trên màn hình cảm ứng để tránh vuốt nhầm
-                delay: 150, // Nhấn giữ 150ms trên điện thoại rồi mới kéo
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ============================================================
+        //  DATA
+        // ============================================================
+        // Key: "YYYY-MM-DD"
+        let db = {};
+
+        const SAMPLE_DATA = {
+            "2026-09-07": [
+                { title: "Giải tích 1", time: "13:00 - 16:35", type: "uni" },
+                { title: "Chạy bộ sáng", time: "06:30 - 07:15", type: "health" }
+            ],
+            "2026-09-08": [
+                { title: "Giáo dục thể chất 1", time: "13:00 - 16:35", type: "uni" },
+                { title: "Học Tiếng Anh", time: "08:30 - 09:30", type: "goal" }
+            ],
+            "2026-09-12": [
+                { title: "Triết học Mác - Lênin", time: "07:00 - 10:35", type: "uni" }
+            ],
+            "2026-09-14": [
+                { title: "Giải tích 1", time: "13:00 - 16:35", type: "uni" }
+            ],
+            "2026-09-15": [
+                { title: "Giáo dục thể chất 1", time: "13:00 - 16:35", type: "uni" }
+            ],
+            "2026-09-19": [
+                { title: "Triết học Mác - Lênin", time: "07:00 - 10:35", type: "uni" }
+            ],
+            "2026-09-21": [
+                { title: "Giải tích 1", time: "13:00 - 16:35", type: "uni" }
+            ],
+            "2026-09-22": [
+                { title: "Giáo dục thể chất 1", time: "13:00 - 16:35", type: "uni" }
+            ],
+            "2026-09-26": [
+                { title: "Triết học Mác - Lênin", time: "07:00 - 10:35", type: "uni" }
+            ],
+            "2026-10-19": [
+                { title: "Giải tích 1", time: "13:00 - 16:35", type: "uni" }
+            ],
+            "2026-10-20": [
+                { title: "Giáo dục thể chất 1", time: "13:00 - 16:35", type: "uni" }
+            ],
+            "2026-10-21": [
+                { title: "Đại số", time: "13:00 - 16:35", type: "uni" }
+            ],
+            "2026-10-22": [
+                { title: "Nhập môn CN số & Ứng dụng AI", time: "13:00 - 16:35", type: "uni" }
+            ],
+            "2026-10-24": [
+                { title: "Triết học Mác - Lênin", time: "07:00 - 10:35", type: "uni" }
+            ],
+            "2026-11-02": [
+                { title: "Giải tích 1", time: "13:00 - 16:35", type: "uni" }
+            ],
+            "2026-11-03": [
+                { title: "Giáo dục thể chất 1", time: "13:00 - 16:35", type: "uni" }
+            ],
+            "2026-11-04": [
+                { title: "Đại số", time: "13:00 - 16:35", type: "uni" }
+            ],
+            "2026-11-05": [
+                { title: "Nhập môn CN số & Ứng dụng AI", time: "13:00 - 16:35", type: "uni" }
+            ],
+            "2026-11-07": [
+                { title: "Triết học Mác - Lênin", time: "07:00 - 10:35", type: "uni" }
+            ],
+            "2026-12-02": [
+                { title: "Nhập môn CN số & Ứng dụng AI", time: "07:00 - 10:35", type: "uni" },
+                { title: "Đại số", time: "13:00 - 16:35", type: "uni" }
+            ],
+            "2026-12-05": [
+                { title: "Triết học Mác - Lênin", time: "07:00 - 10:35", type: "uni" }
+            ],
+            "2026-12-07": [
+                { title: "Giải tích 1", time: "13:00 - 16:35", type: "uni" }
+            ],
+            "2026-12-09": [
+                { title: "Nhập môn CN số & Ứng dụng AI", time: "07:00 - 10:35", type: "uni" },
+                { title: "Đại số", time: "13:00 - 16:35", type: "uni" }
+            ]
+        };
+
+        // ============================================================
+        //  STATE
+        // ============================================================
+        let currentDate = new Date(2026, 8, 4); // Tháng 9/2026
+        let selectedDateStr = "2026-09-04";
+
+        const TYPE_ICONS = {
+            uni: 'fa-book-open',
+            goal: 'fa-bullseye',
+            health: 'fa-heart-pulse',
+            money: 'fa-coins',
+            other: 'fa-puzzle-piece'
+        };
+        const TYPE_CLASSES = {
+            uni: 'uni',
+            goal: 'goal',
+            health: 'health',
+            money: 'money',
+            other: 'other'
+        };
+        const TYPE_DOTS = {
+            uni: 'dot-uni',
+            goal: 'dot-goal',
+            health: 'dot-health',
+            money: 'dot-money',
+            other: 'dot-other'
+        };
+        const TYPE_LABELS = {
+            uni: '📚 Đại Học',
+            goal: '🎯 Mục tiêu',
+            health: '🏃 Sức khỏe',
+            money: '💰 Tài chính',
+            other: '🎨 Khác'
+        };
+
+        // ============================================================
+        //  STORAGE
+        // ============================================================
+        function loadData() {
+            try {
+                const raw = localStorage.getItem('calendar_month_data');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (typeof parsed === 'object' && Object.keys(parsed).length) {
+                        db = parsed;
+                        return true;
+                    }
+                }
+            } catch (_) {}
+            return false;
+        }
+
+        function saveData() {
+            localStorage.setItem('calendar_month_data', JSON.stringify(db));
+        }
+
+        function loadTheme() {
+            const dark = localStorage.getItem('calendar_theme_month') === 'dark';
+            if (dark) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.getElementById('themeIcon').className = 'fa-regular fa-sun';
+            }
+        }
+
+        function saveTheme(dark) {
+            localStorage.setItem('calendar_theme_month', dark ? 'dark' : 'light');
+        }
+
+        // ============================================================
+        //  RENDER CALENDAR
+        // ============================================================
+        function renderCalendar() {
+            const grid = document.getElementById('daysGrid');
+            grid.innerHTML = '';
+
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            // Tiêu đề tháng
+            const monthNames = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+                'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
+            ];
+            document.getElementById('monthTitle').textContent = `${monthNames[month]}, ${year}`;
+
+            // Ngày đầu tháng
+            const firstDay = new Date(year, month, 1);
+            let firstDayIndex = firstDay.getDay() - 1;
+            if (firstDayIndex === -1) firstDayIndex = 6;
+
+            const lastDay = new Date(year, month + 1, 0).getDate();
+            const today = new Date();
+            const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+            // Ô trống
+            for (let i = 0; i < firstDayIndex; i++) {
+                grid.innerHTML += `<div class="day-box empty"></div>`;
+            }
+
+            // Các ngày trong tháng
+            for (let i = 1; i <= lastDay; i++) {
+                const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+                const events = db[dateStr] || [];
+                const isActive = dateStr === selectedDateStr;
+                const isToday = dateStr === todayStr;
+
+                // Dấu chấm
+                let dotsHtml = '';
+                if (events.length > 0) {
+                    const types = new Set(events.map(e => e.type));
+                    dotsHtml = `<div class="event-dots">`;
+                    if (types.has('uni')) dotsHtml += `<div class="dot dot-uni"></div>`;
+                    if (types.has('goal')) dotsHtml += `<div class="dot dot-goal"></div>`;
+                    if (types.has('health')) dotsHtml += `<div class="dot dot-health"></div>`;
+                    if (types.has('money')) dotsHtml += `<div class="dot dot-money"></div>`;
+                    if (types.has('other')) dotsHtml += `<div class="dot dot-other"></div>`;
+                    dotsHtml += `</div>`;
+                }
+
+                const activeClass = isActive ? 'active' : '';
+                const todayClass = isToday ? 'today' : '';
+
+                grid.innerHTML += `
+                    <div class="day-box ${activeClass} ${todayClass}" onclick="selectDate('${dateStr}')">
+                        <span class="day-number">${i}</span>
+                        ${dotsHtml}
+                    </div>
+                `;
+            }
+        }
+
+        // ============================================================
+        //  RENDER AGENDA
+        // ============================================================
+        function renderAgenda() {
+            const events = db[selectedDateStr] || [];
+
+            // Hiển thị ngày
+            const parts = selectedDateStr.split('-');
+            const y = parts[0],
+                m = parts[1],
+                d = parts[2];
+            const dateObj = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+            const dayNames = ['Chủ Nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
+            const dayName = dayNames[dateObj.getDay()];
+            document.getElementById('selectedDateDisplay').innerHTML =
+                `${d}/${m}/${y} <small>${dayName}</small>`;
+
+            const list = document.getElementById('agendaList');
+
+            if (events.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-regular fa-folder-open"></i>
+                        <p>Trống lịch.<br/>Tuyệt vời, hãy dành thời gian nghỉ ngơi!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            events.forEach((ev, index) => {
+                const icon = TYPE_ICONS[ev.type] || 'fa-puzzle-piece';
+                const cls = TYPE_CLASSES[ev.type] || 'other';
+                const timeDisplay = ev.time || 'Cả ngày';
+                html += `
+                    <div class="agenda-card ${cls}">
+                        <i class="fa-regular fa-circle-xmark ag-delete" onclick="deleteEvent('${selectedDateStr}', ${index})"></i>
+                        <div class="ag-time"><i class="fa-regular fa-clock"></i> ${timeDisplay}</div>
+                        <div class="ag-title">
+                            <span class="type-icon"><i class="fa-solid ${icon}"></i></span>
+                            ${ev.title}
+                        </div>
+                    </div>
+                `;
             });
+            list.innerHTML = html;
+        }
+
+        // ============================================================
+        //  INTERACTIONS
+        // ============================================================
+        function selectDate(dateStr) {
+            selectedDateStr = dateStr;
+            renderCalendar();
+            renderAgenda();
+        }
+
+        function changeMonth(step) {
+            currentDate.setMonth(currentDate.getMonth() + step);
+            // Nếu chuyển tháng, chọn ngày đầu tháng
+            const y = currentDate.getFullYear();
+            const m = String(currentDate.getMonth() + 1).padStart(2, '0');
+            selectedDateStr = `${y}-${m}-01`;
+            renderCalendar();
+            renderAgenda();
+        }
+
+        function goToday() {
+            const today = new Date();
+            currentDate = new Date(today.getFullYear(), today.getMonth(), 1);
+            const y = today.getFullYear();
+            const m = String(today.getMonth() + 1).padStart(2, '0');
+            const d = String(today.getDate()).padStart(2, '0');
+            selectedDateStr = `${y}-${m}-${d}`;
+            renderCalendar();
+            renderAgenda();
+            showToast('📅 Đã chuyển về hôm nay');
+        }
+
+        // ============================================================
+        //  CRUD EVENTS
+        // ============================================================
+        function deleteEvent(dateStr, index) {
+            if (confirm('Bạn có chắc muốn xóa lịch trình này?')) {
+                db[dateStr].splice(index, 1);
+                if (db[dateStr].length === 0) delete db[dateStr];
+                saveData();
+                renderCalendar();
+                renderAgenda();
+                showToast('Đã xóa');
+            }
+        }
+
+        function openModal() {
+            document.getElementById('evTitle').value = '';
+            document.getElementById('evTime').value = '';
+            document.getElementById('evType').value = 'uni';
+            document.getElementById('eventModal').style.display = 'flex';
+            setTimeout(() => document.getElementById('evTitle').focus(), 100);
+        }
+
+        function closeModal() {
+            document.getElementById('eventModal').style.display = 'none';
+        }
+
+        function saveEvent() {
+            const title = document.getElementById('evTitle').value.trim();
+            const time = document.getElementById('evTime').value.trim() || 'Cả ngày';
+            const type = document.getElementById('evType').value;
+
+            if (!title) {
+                showToast('Vui lòng nhập tên công việc!', true);
+                return;
+            }
+
+            if (!db[selectedDateStr]) db[selectedDateStr] = [];
+            db[selectedDateStr].push({ title, time, type });
+            saveData();
+            closeModal();
+            renderCalendar();
+            renderAgenda();
+            showToast('Đã thêm lịch trình!');
+        }
+
+        // ============================================================
+        //  THEME
+        // ============================================================
+        function toggleTheme() {
+            const html = document.documentElement;
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            document.getElementById('themeIcon').className = isDark ? 'fa-regular fa-moon' : 'fa-regular fa-sun';
+            saveTheme(!isDark);
+        }
+
+        // ============================================================
+        //  EXPORT / IMPORT
+        // ============================================================
+        function exportData() {
+            const data = {
+                version: '1.0',
+                exportedAt: new Date().toISOString(),
+                events: db
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `lich_hoc_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Đã xuất dữ liệu');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.events && typeof data.events === 'object') {
+                        if (confirm(`Bạn có muốn nhập dữ liệu? Dữ liệu hiện tại sẽ bị thay thế.`)) {
+                            db = data.events;
+                            saveData();
+                            renderCalendar();
+                            renderAgenda();
+                            showToast(`Đã nhập ${Object.keys(db).length} ngày có lịch!`);
+                        }
+                    } else {
+                        showToast('File không hợp lệ!', true);
+                    }
+                } catch (_) {
+                    showToast('Lỗi đọc file!', true);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function clearAll() {
+            if (confirm('Bạn có chắc muốn xóa toàn bộ lịch trình?')) {
+                db = {};
+                saveData();
+                renderCalendar();
+                renderAgenda();
+                showToast('Đã xóa tất cả');
+            }
+        }
+
+        // ============================================================
+        //  TOAST
+        // ============================================================
+        let toastTimer;
+
+        function showToast(msg, isError = false) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.className = 'toast' + (isError ? ' error' : '');
+            el.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+        }
+
+        // ============================================================
+        //  KEYBOARD SHORTCUTS
+        // ============================================================
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                e.preventDefault();
+                openModal();
+            }
+            if (e.key === 'Escape') {
+                if (document.getElementById('eventModal').style.display === 'flex') {
+                    closeModal();
+                }
+            }
         });
+
+        document.getElementById('eventModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeModal();
+        });
+
+        // ============================================================
+        //  INIT
+        // ============================================================
+        function init() {
+            loadTheme();
+
+            // Load data hoặc dùng mẫu
+            if (!loadData()) {
+                db = JSON.parse(JSON.stringify(SAMPLE_DATA));
+                saveData();
+            }
+
+            // Chọn ngày hôm nay
+            const today = new Date();
+            const y = today.getFullYear();
+            const m = String(today.getMonth() + 1).padStart(2, '0');
+            const d = String(today.getDate()).padStart(2, '0');
+            const todayStr = `${y}-${m}-${d}`;
+            if (db[todayStr] !== undefined) {
+                selectedDateStr = todayStr;
+            } else {
+                // Tìm ngày gần nhất có dữ liệu
+                const keys = Object.keys(db).sort();
+                if (keys.length > 0) {
+                    const todayNum = parseInt(todayStr.replace(/-/g, ''));
+                    let closest = keys[0];
+                    let closestDiff = Math.abs(parseInt(keys[0].replace(/-/g, '')) - todayNum);
+                    for (const k of keys) {
+                        const diff = Math.abs(parseInt(k.replace(/-/g, '')) - todayNum);
+                        if (diff < closestDiff) {
+                            closestDiff = diff;
+                            closest = k;
+                        }
+                    }
+                    selectedDateStr = closest;
+                }
+            }
+
+            currentDate = new Date(parseInt(selectedDateStr.split('-')[0]), parseInt(selectedDateStr.split('-')[1]) - 1, 1);
+
+            renderCalendar();
+            renderAgenda();
+        }
+
+        init();
     </script>
 
 </body>
