@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng Lịch Trình & Mục Tiêu</title>
+    <!-- Nhúng thư viện SortableJS để hỗ trợ kéo thả trên điện thoại -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <style>
+        /* CSS Căn bản & Reset */
+        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #f4f5f7; margin: 0; padding: 20px; color: #333; }
+        h1 { text-align: center; color: #172b4d; margin-bottom: 20px; font-size: 24px; }
+
+        /* Bố cục Bảng (Board) */
+        .board {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto; /* Cuộn ngang trên PC nếu quá nhiều cột */
+            padding-bottom: 20px;
+            align-items: flex-start;
+        }
+
+        /* Bố cục Cột (Column) */
+        .column {
+            background-color: #ebecf0;
+            border-radius: 8px;
+            min-width: 280px;
+            max-width: 300px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .column-header {
+            padding: 12px 15px;
+            font-weight: 600;
+            color: #172b4d;
+            border-bottom: 2px solid #dfe1e6;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .column-body {
+            padding: 10px;
+            min-height: 150px; /* Đảm bảo có khoảng trống để thả thẻ vào */
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Bố cục Thẻ (Card) */
+        .card {
+            background-color: #fff;
+            padding: 12px;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            cursor: grab;
+            font-size: 14px;
+            line-height: 1.4;
+            transition: transform 0.1s, box-shadow 0.1s;
+            border-left: 4px solid #ccc;
+        }
+
+        .card:active { cursor: grabbing; }
+
+        /* Phân loại màu sắc thẻ */
+        .card.university { border-left-color: #0079bf; } /* Môn đại học - Xanh dương */
+        .card.goal { border-left-color: #f2d600; }       /* Mục tiêu - Vàng */
+        .card.health { border-left-color: #61bd4f; }     /* Sức khỏe - Xanh lá */
+        
+        .time-tag {
+            display: inline-block;
+            background: #dfe1e6;
+            color: #42526e;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-top: 8px;
+            font-weight: bold;
+        }
+
+        /* Hiệu ứng khi kéo thả */
+        .sortable-ghost { opacity: 0.4; background-color: #f4f5f7; border: 1px dashed #0079bf; }
+        .sortable-drag { cursor: grabbing !important; }
+
+        /* Responsive cho Điện thoại (iPhone) */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .board {
+                flex-direction: column; /* Xếp dọc các cột trên mobile */
+                overflow-x: hidden;
+            }
+            .column {
+                min-width: 100%;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📅 Bảng Lịch Trình & Mục Tiêu Cá Nhân</h1>
+
+    <div class="board">
+        <!-- Cột: Chờ Xử Lý (Kho chứa mục tiêu) -->
+        <div class="column">
+            <div class="column-header">🎯 Mục tiêu & Thói quen</div>
+            <div class="column-body" id="col-backlog">
+                <div class="card goal">Học Tiếng Anh <br><span class="time-tag">30 phút/ngày</span></div>
+                <div class="card health">Tập thể dục sáng <br><span class="time-tag">06:30 - 07:15</span></div>
+                <div class="card goal">Làm đề thi Bằng lái A1</div>
+                <div class="card goal">Cập nhật chi tiêu vào App</div>
+            </div>
+        </div>
+
+        <!-- Cột: Thứ 2 -->
+        <div class="column">
+            <div class="column-header">Thứ 2</div>
+            <div class="column-body" id="col-mon">
+                <div class="card university">Giải tích 1 <br><span class="time-tag">13:00 - 16:35</span></div>
+            </div>
+        </div>
+
+        <!-- Cột: Thứ 3 -->
+        <div class="column">
+            <div class="column-header">Thứ 3</div>
+            <div class="column-body" id="col-tue">
+                <div class="card university">Giáo dục thể chất 1 <br><span class="time-tag">13:00 - 16:35</span></div>
+            </div>
+        </div>
+
+        <!-- Cột: Thứ 4 -->
+        <div class="column">
+            <div class="column-header">Thứ 4</div>
+            <div class="column-body" id="col-wed">
+                <div class="card university">Đại số <br><span class="time-tag">13:00 - 16:35</span></div>
+            </div>
+        </div>
+
+        <!-- Cột: Thứ 5 -->
+        <div class="column">
+            <div class="column-header">Thứ 5</div>
+            <div class="column-body" id="col-thu">
+                <div class="card university">Nhập môn AI <br><span class="time-tag">13:00 - 16:35</span></div>
+            </div>
+        </div>
+
+        <!-- Cột: Thứ 6 (Trống lịch) -->
+        <div class="column">
+            <div class="column-header">Thứ 6</div>
+            <div class="column-body" id="col-fri">
+                <!-- Bạn có thể kéo thả mục tiêu vào đây -->
+            </div>
+        </div>
+
+        <!-- Cột: Thứ 7 -->
+        <div class="column">
+            <div class="column-header">Thứ 7</div>
+            <div class="column-body" id="col-sat">
+                <div class="card university">Triết học Mác - Lênin <br><span class="time-tag">07:00 - 10:35</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lấy tất cả các vùng có thể chứa thẻ (column-body)
+        const columns = document.querySelectorAll('.column-body');
+
+        // Kích hoạt tính năng Kéo-Thả cho từng cột
+        columns.forEach(col => {
+            new Sortable(col, {
+                group: 'shared', // Cho phép kéo thả chéo giữa các cột
+                animation: 150,  // Tốc độ hiệu ứng di chuyển (ms)
+                ghostClass: 'sortable-ghost', // Lớp CSS khi thẻ đang được giữ
+                dragClass: 'sortable-drag',
+                delayOnTouchOnly: true, // Chỉ delay trên màn hình cảm ứng để tránh vuốt nhầm
+                delay: 150, // Nhấn giữ 150ms trên điện thoại rồi mới kéo
+            });
+        });
+    </script>
+
+</body>
+</html>
